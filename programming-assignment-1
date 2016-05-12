@@ -2,9 +2,13 @@ pollutantmean<-function(directory,pollutant,id=1:332){
         
         file_data_mean<-numeric()
         for (i in id){
+        
+                #读取定义的文件，注意paste函数和formatc函数的使用，以及paste函数sep参数的使用
                 file_read<-read.csv(paste("D:/04-learning/06-data analysis/03-work","/",directory,"/",formatC(i, flag = '0', width = 3),'.csv',sep=""))
+                #现有的数据添加到nobs数组中
                 file_data_mean<-c(file_data_mean,file_read[[pollutant]])
         }
+        #计算平均值
         return(mean(file_data_mean,na.rm = TRUE))
         
         
