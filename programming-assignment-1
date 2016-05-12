@@ -1,0 +1,57 @@
+pollutantmean<-function(directory,pollutant,id=1:332){
+        
+        file_data_mean<-numeric()
+        for (i in id){
+                file_read<-read.csv(paste("D:/04-learning/06-data analysis/03-work","/",directory,"/",formatC(i, flag = '0', width = 3),'.csv',sep=""))
+                file_data_mean<-c(file_data_mean,file_read[[pollutant]])
+        }
+        return(mean(file_data_mean,na.rm = TRUE))
+        
+        
+}
+
+complete <- function(directory, id = 1:332) {
+        
+        ## 'directory' is a character vector of length 1 indicating the location of the CSV files
+        
+        ## 'id' is an integer vector indicating the monitor ID numbers to be used
+        
+        ## Return a data frame of the form: id nobs 1 117 2 1041 ...  where 'id' is the monitor ID number and 'nobs' is the number of complete cases
+        
+        
+        #定义空的numeric数组
+        nobs = numeric()
+        
+        for (i in id) {
+                
+                #读取定义的文件，注意paste函数和formatc函数的使用，以及paste函数sep参数的使用
+                newRead = read.csv(paste("D:/04-learning/06-data analysis/03-work","/",directory, "/", formatC(i, width = 3, flag = "0"),".csv", sep = ""))
+                
+                #现有的数据添加到nobs数组中，complete.case函数返回数组每个值得逻辑值，sum计算逻辑值为TRUE的数据的个数
+                nobs = c(nobs, sum(complete.cases(newRead)))
+        }
+        
+        #data.frame函数
+        return(data.frame(id, nobs))
+}
+
+corr <- function(directory, threshold = 0) {
+        ## 'directory' is a character vector of length 1 indicating the location of
+        ## the CSV files
+        
+        ## 'threshold' is a numeric vector of length 1 indicating the number of
+        ## completely observed observations (on all variables) required to compute
+        ## the correlation between nitrate and sulfate; the default is 0
+        
+        ## Return a numeric vector of correlations
+        df = complete(directory)
+        ids = df[df["nobs"] > threshold, ]$id
+        corrr = numeric()
+        for (i in ids) {
+                
+                newRead = read.csv(paste("D:/04-learning/06-data analysis/03-work","/",directory, "/", formatC(i, width = 3, flag = "0"),".csv", sep = ""))
+                dff = newRead[complete.cases(newRead), ]
+                corrr = c(corrr, cor(dff$sulfate, dff$nitrate))
+        }
+        return(corrr)
+}
